@@ -32,7 +32,10 @@ class _MainPageState extends State<MainPage> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(title: Text("Home"),),
-        body: screens[pageIndex],
+        body: IndexedStack(
+          index: pageIndex,
+          children: screens,
+        ),
 
         //La bar de naviguation du bas
         bottomNavigationBar: BottomNavigationBar(
