@@ -12,7 +12,7 @@ class _TransactionState extends State<Transaction> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.yellowAccent,
+        //color: Colors.grey,
       ),
     );
   }

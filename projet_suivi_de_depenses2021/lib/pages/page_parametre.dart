@@ -12,7 +12,7 @@ class _ParametreState extends State<Parametre> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.grey,
+        //color: Colors.grey,
       ),
     );
   }
