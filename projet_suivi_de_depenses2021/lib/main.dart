@@ -10,17 +10,6 @@ import 'package:projet_suivi_de_depenses2021/pages/solde.dart';
 void main() {
   runApp(const MainPage());
 }
-class page extends StatelessWidget{
-  @override
-  Widget build(BuildContext context) {
-   return MaterialApp(
-     theme: ThemeData(
-       primarySwatch: Colors.grey,
-            ),
-   );
-     }
-
-}
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -33,8 +22,6 @@ class _MainPageState extends State<MainPage> {
 
   int pageIndex = 0;
   final screens = [
-    connexion(),
-    solde(),
     Transaction(),
     Portefeuille(),
     Stats(),
@@ -45,9 +32,10 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: connexion()/*Scaffold(
-        appBar: AppBar(title: Text("Home"),
-        backgroundColor: Colors.teal,
+      home: Scaffold(
+        appBar: AppBar(title: Text("Nom de l'application"),
+          backgroundColor: Colors.teal,
+          actions: [IconButton(onPressed: (){}, icon: Icon(Icons.login))],
         ),
         body: IndexedStack(
           index: pageIndex,
@@ -68,7 +56,7 @@ class _MainPageState extends State<MainPage> {
             BottomNavigationBarItem(icon: Icon(Icons.home),label: "Stats",backgroundColor: Colors.white,),
             BottomNavigationBarItem(icon: Icon(Icons.home),label: "Parametre",backgroundColor: Colors.white,),
         ],),
-      )*/,
+      ),
     );
   }
 }

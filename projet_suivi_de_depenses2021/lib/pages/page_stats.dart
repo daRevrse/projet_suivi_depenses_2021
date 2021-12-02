@@ -12,7 +12,7 @@ class _StatsState extends State<Stats> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        //color: Colors.grey,
+        color: Colors.grey[300],
       ),
     );
   }
