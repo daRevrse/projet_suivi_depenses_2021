@@ -18,14 +18,26 @@ class _TransactionState extends State<Transaction> {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-        appBar: AppBar(title: Text("Transaction"),
-          backgroundColor: Colors.teal,
-          actions: [IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today))],
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(100),
+          child: AppBar(title: FittedBox(child: Text("Nom de l'utilisateur"),alignment: Alignment.center,),
+            titleTextStyle: TextStyle(fontSize: 30),
+            backgroundColor: Colors.teal,
+            //actions: [IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today))],
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(80),
+              child: Container(
+                alignment: Alignment.centerLeft,
+                color: Colors.teal,
+                child: Text("Transactions",style: TextStyle(color: Colors.white,fontSize: 25),),
+              ),
+            )
       ),
-      backgroundColor: Colors.grey[300],
-      body: Column(
-        children: [
-          ClipPath(
+        ),
+        backgroundColor: Colors.grey[300],
+        body: Column(
+          children: [
+           ClipPath(
             clipper: ClippingClass(),
             child: Container(
               height: 170,
@@ -41,15 +53,24 @@ class _TransactionState extends State<Transaction> {
             ),
           ),
 
-          Padding(
+           Padding(
             padding: EdgeInsets.only(top: 20),
             child: Container(
-              height: 70,
-              width: screenSize.width,
-              alignment: Alignment.center,
-              color: Colors.grey,
-              child: Text(DateFormat('dd-MM-yyyy').format(date),style: TextStyle(fontSize: 50,),),
-            ),
+                    height: 70,
+                    width: screenSize.width,
+                    alignment: Alignment.center,
+                    color: Colors.grey,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(left: 20.0),
+                          child: Container(child: Text(DateFormat('dd-MM-yyyy').format(date),style: TextStyle(fontSize: 40,),)),
+                        ),
+                        Container(child: IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today),alignment: Alignment.center,))
+                      ],
+                    )
+                ),
           ),
 
           Container(
@@ -62,9 +83,13 @@ class _TransactionState extends State<Transaction> {
                   title: Text("Le titre"),
                   subtitle: Text("La description"),
                   trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Montant"),
-                      Text("Heure")
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 10),
+                        child: Text("Heure"),
+                      )
                     ],
                   ),
                 )

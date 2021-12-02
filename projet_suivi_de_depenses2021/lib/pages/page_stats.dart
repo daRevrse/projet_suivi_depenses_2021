@@ -11,6 +11,22 @@ class _StatsState extends State<Stats> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(title: FittedBox(child: Text("Nom de l'utilisateur"),alignment: Alignment.center,),
+            titleTextStyle: TextStyle(fontSize: 30),
+            backgroundColor: Colors.teal,
+            //actions: [IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today))],
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(80),
+              child: Container(
+                alignment: Alignment.centerLeft,
+                color: Colors.teal,
+                child: Text("Statistiques",style: TextStyle(color: Colors.white,fontSize: 25),),
+              ),
+            )
+        ),
+      ),
       body: Container(
         color: Colors.grey[300],
       ),

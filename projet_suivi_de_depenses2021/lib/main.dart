@@ -33,10 +33,6 @@ class _MainPageState extends State<MainPage> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(title: Text("Nom de l'application"),
-          backgroundColor: Colors.teal,
-          actions: [IconButton(onPressed: (){}, icon: Icon(Icons.login))],
-        ),
         body: IndexedStack(
           index: pageIndex,
           children: screens,

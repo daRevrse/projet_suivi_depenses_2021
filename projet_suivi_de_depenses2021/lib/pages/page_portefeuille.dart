@@ -17,9 +17,21 @@ class _PortefeuilleState extends State<Portefeuille> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text("Portefeuille"),
-        backgroundColor: Colors.teal,
-        //actions: [IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today))],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(title: FittedBox(child: Text("Nom de l'utilisateur"),alignment: Alignment.center,),
+            titleTextStyle: TextStyle(fontSize: 30),
+            backgroundColor: Colors.teal,
+            //actions: [IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today))],
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(80),
+              child: Container(
+                alignment: Alignment.centerLeft,
+                color: Colors.teal,
+                child: Text("Portefeuille",style: TextStyle(color: Colors.white,fontSize: 25),),
+              ),
+            )
+        ),
       ),
         backgroundColor: Colors.grey[300],
         body: Container(
@@ -35,7 +47,6 @@ class _PortefeuilleState extends State<Portefeuille> {
                   padding: EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 10),
                   child: Column(
                     children: [
-                      Text("Portefeuille"),
                       Container(
                         child: ListView(
                           shrinkWrap: true,
@@ -57,7 +68,7 @@ class _PortefeuilleState extends State<Portefeuille> {
                                 title: Text("Titre"),
                                 subtitle: Text("montant"),
                                 trailing: Icon(Icons.add),
-                                tileColor: Colors.blueAccent,
+                                tileColor: Colors.greenAccent,
                               ),
                             ),
 
@@ -67,7 +78,7 @@ class _PortefeuilleState extends State<Portefeuille> {
                                 title: Text("Titre"),
                                 subtitle: Text("montant"),
                                 trailing: Icon(Icons.add),
-                                tileColor: Colors.blueAccent,
+                                tileColor: Colors.redAccent,
                               ),
                             )
                           ],
