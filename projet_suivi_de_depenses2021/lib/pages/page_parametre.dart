@@ -14,8 +14,8 @@ class _ParametreState extends State<Parametre> {
       backgroundColor: Colors.grey[300],
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
-        child: AppBar(title: FittedBox(child: Text("Nom de l'utilisateur"),alignment: Alignment.center,),
-            titleTextStyle: TextStyle(fontSize: 30),
+        child: AppBar(title: FittedBox(child: Text("Kodjo"),alignment: Alignment.center,),
+            titleTextStyle: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),
             backgroundColor: Colors.teal,
             //actions: [IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today))],
             bottom: PreferredSize(
