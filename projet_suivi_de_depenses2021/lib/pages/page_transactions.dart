@@ -1,112 +1,239 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:projet_suivi_de_depenses2021/Database/compte_operations.dart';
+import 'package:projet_suivi_de_depenses2021/Database/transactions_operations.dart';
+import 'package:projet_suivi_de_depenses2021/Models/compteModel.dart';
+import 'package:projet_suivi_de_depenses2021/Models/transactionModel.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_creation/nouvelle_transaction.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_list/page_list_transactions.dart';
+import 'package:collection/collection.dart';
 
-class Transaction extends StatefulWidget {
-  const Transaction({Key? key}) : super(key: key);
+
+class PageTransaction extends StatefulWidget {
+  final String userName;
+  const PageTransaction({Key? key,required this.userName}) : super(key: key);
+
 
   @override
-  _TransactionState createState() => _TransactionState();
+  _PageTransactionState createState() => _PageTransactionState();
 }
 
-class _TransactionState extends State<Transaction> {
+class _PageTransactionState extends State<PageTransaction> {
 
+  //UserOperations userOperations = UserOperations();
+  TransactionOperations transactionOperations = TransactionOperations();
+  CompteOperations compteOperations = CompteOperations();
 
   var date = DateTime.now();
-  
+
+  num somme = 0;
+
+  void calcTotal() async {
+    var total_sum = (await compteOperations.getSomme())[0]['TOTAL'];
+
+    print(total_sum);
+    setState(() {
+      somme = total_sum;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    calcTotal();
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    initializeDateFormatting("fr");
 
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(100),
-          child: AppBar(title: FittedBox(child: Text("Kodjo"),alignment: Alignment.center,),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: AppBar(
+            automaticallyImplyLeading: false,
+            title: FittedBox(child: Text('${widget.userName}'),alignment: Alignment.center,),
             titleTextStyle: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),
             backgroundColor: Colors.teal,
-            //actions: [IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today))],
+            actions: [
+              IconButton(
+                  padding: EdgeInsets.only(right: 10,top: 5),
+                  onPressed: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> ListeTransactions()));
+                  }, icon: Icon(Icons.article_outlined ,size: 30,))],
             bottom: PreferredSize(
               preferredSize: Size.fromHeight(80),
               child: Container(
                 alignment: Alignment.centerLeft,
-                color: Colors.teal,
-                child: Text("Transactions",style: TextStyle(color: Colors.white,fontSize: 25),),
+                color: Colors.teal[800],
+                child: Text("Transactions",style: TextStyle(color: Colors.white,fontSize: 20),),
               ),
             )
+        )
       ),
-        ),
-        backgroundColor: Colors.grey[300],
-        body: Column(
+      backgroundColor: Colors.grey[300],
+      body: SingleChildScrollView(
+        child: Column(
           children: [
-           ClipPath(
-            clipper: ClippingClass(),
-            child: Container(
-              height: 170,
-              color: Colors.white,
-              child: Padding(
-                padding: EdgeInsets.only(top: 40),
-                child: ListTile(
-                    leading: Icon(Icons.home,size: 60,),
-                    title: Text("Solde",style: TextStyle(fontSize: 20),),
-                    subtitle: FittedBox(child: Text("Cfa 20,00000000000000",style: TextStyle(fontSize: 50),)),
+            ClipPath(
+              clipper: ClippingClass(),
+              child: Container(
+                height: 150,
+                color: Colors.white,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          alignment: Alignment.topCenter,
+                          child: Image.asset("assets/575270.png",height: 80,width: 80,),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width - 80,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Solde totale en Cfa",style: TextStyle(fontSize: 20),),
+                              Container(
+                                  child: AutoSizeText(
+                                    '${somme}',
+                                    //style: TextStyle(color: Colors.black,fontSize: 40),
+                                    presetFontSizes: [50,25,20],
+                                    maxLines: 2,
+                                    overflowReplacement: Text("Vous etes trop riche"),
+                                  )
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
+                ),
               ),
             ),
-          ),
 
-           Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: Container(
-                    height: 70,
-                    width: screenSize.width,
-                    alignment: Alignment.center,
-                    color: Colors.grey,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 20.0),
-                          child: Container(child: Text(DateFormat('dd-MM-yyyy').format(date),style: TextStyle(fontSize: 40,),)),
-                        ),
-                        Container(child: IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today),alignment: Alignment.center,))
-                      ],
-                    )
-                ),
-          ),
-
-          Container(
-            color: Colors.white,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                ListTile(
-                  leading: Icon(Icons.home),
-                  title: Text("Le titre"),
-                  subtitle: Text("La description"),
-                  trailing: Column(
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Container(
+                  height: 50,
+                  width: screenSize.width,
+                  alignment: Alignment.center,
+                  color: Colors.green,
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Montant"),
                       Padding(
-                        padding: EdgeInsets.only(bottom: 10),
-                        child: Text("Heure"),
-                      )
+                        padding: EdgeInsets.only(left: 40.0),
+                        child: Container(
+                            child: Text(
+                              DateFormat.yMMMMd("fr_FR").format(date),
+                              style: TextStyle(fontSize: 30),
+                            )
+                        ),
+                      ),
+                      Container(
+                          child: IconButton(onPressed: (){
+                            setState(() {
+                            });
+                          }, icon: Icon(Icons.view_list),alignment: Alignment.center,))
                     ],
-                  ),
-                )
-              ],
+                  )
+              ),
             ),
-          )
-        ],
+
+            Container(
+              child: FutureBuilder<List<TransactionModel>?>(
+                  future: transactionOperations.getTransactionModelData(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<TransactionModel>?> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(child: Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.swap_horiz,size: 70,color: Colors.grey,),
+                            Text("Aucune transaction",style: TextStyle(fontSize: 20,color: Colors.grey),)
+                          ],
+                        ),
+
+                      ));
+                    }else {
+                      return snapshot.data!.isEmpty
+                          ? Center(child: Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.swap_horiz,size: 70,color: Colors.grey,),
+                            Text("Aucune transaction",style: TextStyle(fontSize: 20,color: Colors.grey),)
+                          ],
+                        ),
+
+                      ))
+                          : ListView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: snapshot.data!.map((trans) {
+                          return Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(15),
+                                        bottomRight: Radius.circular(15),
+                                      )
+                                  ),
+                                  child: ListTile(
+                                    leading: Icon(Icons.swap_horiz),
+                                    title: Text('${trans.titre}'),
+                                    subtitle: Text('${trans.description}'),
+                                    trailing: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('${trans.montant}'),
+                                        Padding(
+                                          padding: EdgeInsets.only(bottom: 10),
+                                          child: Text('${trans.type}'),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                        }).toList(),
+                      );
+                    }
+                  }),
+            )
+          ],
+        ),
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
+        onPressed: (){
+          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> NewTransaction()));
+        },
         child: Icon(Icons.add),
-        backgroundColor: Colors.blueAccent[700],
+        backgroundColor: Colors.teal,
       ),
     );
+
   }
 }
+
 
 class ClippingClass extends CustomClipper<Path> {
   @override
@@ -125,3 +252,4 @@ class ClippingClass extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
+
