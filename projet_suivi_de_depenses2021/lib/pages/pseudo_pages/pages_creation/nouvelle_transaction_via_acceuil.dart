@@ -8,21 +8,21 @@ import 'package:projet_suivi_de_depenses2021/Models/categorieModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/compteModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/transactionModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
-import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_list/page_list_transactions.dart';
+import 'package:projet_suivi_de_depenses2021/pages/root_app_page.dart';
 
 
 DateTime date = DateTime.now();
 TimeOfDay time = TimeOfDay.fromDateTime(date);
 
-class NewTransaction extends StatefulWidget {
+class NewTransactionViaAcceuil extends StatefulWidget {
   final User user;
-  const NewTransaction({Key? key,required this.user}) : super(key: key);
+  const NewTransactionViaAcceuil({Key? key,required this.user}) : super(key: key);
 
   @override
-  _NewTransaction createState() => _NewTransaction();
+  _NewTransactionViaAcceuil createState() => _NewTransactionViaAcceuil();
 }
 
-class _NewTransaction extends State<NewTransaction> {
+class _NewTransactionViaAcceuil extends State<NewTransactionViaAcceuil> {
 
   TransactionOperations transactionOperations = TransactionOperations();
   CompteOperations compteOperations = CompteOperations();
@@ -40,7 +40,8 @@ class _NewTransaction extends State<NewTransaction> {
 
   CompteModel? compte;
   CategorieModel? categorie;
-  String defaultCptHintText = "Selectionner un compte";
+  String defaultCptRHintText = "Selectionner un compte";
+  String defaultCptDHintText = "Selectionner un compte";
   String defaultCatRHintText = "Selectionner une catégorie";
   String defaultCatDHintText = "Selectionner une catégorie";
 
@@ -150,8 +151,8 @@ class _NewTransaction extends State<NewTransaction> {
 
                               onPressed: (){
                                 showTimePicker(
-                                    context: context,
-                                    initialTime: time,
+                                  context: context,
+                                  initialTime: time,
                                 ).then((value) {
                                   setState(() {
                                     time = value!;
@@ -211,12 +212,12 @@ class _NewTransaction extends State<NewTransaction> {
                                 onChanged: (CompteModel? value) {
                                   setState(() {
                                     compte = value;
-                                    defaultCptHintText = compte!.nom!;
+                                    defaultCptRHintText = compte!.nom!;
                                   });
                                 },
                                 isExpanded: false,
                                 //value: _currentUser,
-                                hint: Text('${defaultCptHintText}'),
+                                hint: Text('${defaultCptRHintText}'),
                                 dropdownColor: Colors.white,
                               );
                             }),
@@ -276,7 +277,7 @@ class _NewTransaction extends State<NewTransaction> {
 
                                   await compteOperations.updateCompte(compte!);
 
-                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> ListeTransactions(user: widget.user,periode: "Tous",)));
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> RootPage(user: widget.user)));
 
                                 },
                                 child: Text("Enregistrer"),)
@@ -424,12 +425,12 @@ class _NewTransaction extends State<NewTransaction> {
                                 onChanged: (CompteModel? value) {
                                   setState(() {
                                     compte = value;
-                                    defaultCptHintText = compte!.nom!;
+                                    defaultCptDHintText = compte!.nom!;
                                   });
                                 },
                                 isExpanded: false,
                                 //value: _currentUser,
-                                hint: Text('${defaultCptHintText}'),
+                                hint: Text('${defaultCptDHintText}'),
                                 dropdownColor: Colors.white,
                               );
                             }),
@@ -487,7 +488,7 @@ class _NewTransaction extends State<NewTransaction> {
 
                                   await compteOperations.updateCompte(compte!);
 
-                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> ListeTransactions(user: widget.user,periode: "Tous",)));
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> RootPage(user: widget.user,)));
 
                                 },
                                 child: Text("Enregistrer"),)

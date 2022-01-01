@@ -1,18 +1,25 @@
 class User {
   int? id;
-  final String nom;
+  String? nom;
 
-  User({this.id, required this.nom});
+  User(
+      this.nom,
+      );
 
-  factory User.fromMap(Map<String, dynamic> map) => User(
-    id: map['id'],
-    nom: map['nom'],
-  );
-
-  Map<String, dynamic> toMap(){
-    return{
-      'id': id,
-      'nom': nom,
-    };
+  User.fromMap(dynamic obj) {
+    this.id = obj['id'];
+    this.nom = obj["nom"];
   }
+
+  Map<String, dynamic> toMap() {
+    var map = new Map<String, dynamic>();
+    map["id"] = id;
+    map["nom"] = nom;
+
+    return map;
+  }
+
+  //Getters
+  int? get getId => id;
+  String? get getNom => nom;
 }

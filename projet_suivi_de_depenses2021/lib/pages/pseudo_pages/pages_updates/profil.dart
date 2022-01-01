@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projet_suivi_de_depenses2021/Database/compte_operations.dart';
+import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 var username;
 class Profil extends StatefulWidget {
-  const Profil({Key? key}) : super(key: key);
+  final User user;
+  const Profil({Key? key,required this.user}) : super(key: key);
 
   @override
   _Profil createState() => _Profil();
@@ -29,7 +31,7 @@ class _Profil extends State<Profil> {
   num somme = 0;
 
   void calcTotal() async {
-    var total_sum = (await compteOperations.getSomme())[0]['TOTAL'];
+    var total_sum = (await compteOperations.getSomme(widget.user))[0]['TOTAL'];
 
     print(total_sum);
     setState(() {

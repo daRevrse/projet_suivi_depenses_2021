@@ -7,11 +7,22 @@ class UserOperations{
 
   final dbHelper = DatabaseHelper.instance;
 
-  Future<List<User>> getUser() async {
-    final db = await dbHelper.database;
-    List<Map<String, dynamic>> items = await db.query('users', orderBy: 'id DESC',);
+  Future<User> getUser(int id) async {
+    var dbClient = await dbHelper.database;
+    String sql;
+    sql = "SELECT * FROM users WHERE id = $id";
 
-    return List.generate(items.length, (index) => User(nom: items[index]['nom'],id: items[index]['id']));
+    var result = await dbClient.rawQuery(sql);
+
+    return User.fromMap(result.first);
+  }
+
+  Future<int?> getCount() async {
+    var dbClient = await dbHelper.database;
+    var result = Sqflite.firstIntValue(
+        await dbClient.rawQuery("SELECT COUNT (*) FROM users")
+    );
+    return result;
   }
 
   Future<void> add(User user) async {

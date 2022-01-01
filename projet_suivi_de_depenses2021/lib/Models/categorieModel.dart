@@ -1,25 +1,24 @@
-class CompteModel {
+import 'dart:ui';
+
+class CategorieModel {
   int? id;
   String? nom;
-  String? description;
-  num? montant;
+  String? type;
   int? color;
   int? user_id;
 
-  CompteModel(
+  CategorieModel(
       //this.id,
       this.nom,
-      this.description,
-      this.montant,
+      this.type,
       this.color,
       this.user_id,
       );
 
-  CompteModel.fromMap(dynamic obj) {
+  CategorieModel.fromMap(dynamic obj) {
     this.id = obj['id'];
     this.nom = obj["nom"];
-    this.description = obj["description"];
-    this.montant = obj["montant"];
+    this.type = obj["type"];
     this.color = obj["color"];
     this.user_id = obj["user_id"];
   }
@@ -29,8 +28,7 @@ class CompteModel {
 
     map["id"] = id;
     map["nom"] = nom;
-    map["description"] = description;
-    map["montant"] = montant;
+    map["type"] = type;
     map["color"] = color;
     map["user_id"] = user_id;
 
@@ -40,8 +38,7 @@ class CompteModel {
   //Getters
   int? get getId => id;
   String? get getNom => nom;
-  String? get getDescription => description;
-  num? get getMontant => montant;
+  String? get getType => type;
   int? get getColor => color;
   int? get getUserId => user_id;
 }

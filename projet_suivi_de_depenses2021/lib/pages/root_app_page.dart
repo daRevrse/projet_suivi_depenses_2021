@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'page_connexion.dart';
 import 'page_parametre.dart';
@@ -6,10 +7,11 @@ import 'page_portefeuille.dart';
 import 'page_stats.dart';
 import 'page_transactions.dart';
 
-var username;
+var userid;
 
 class RootPage extends StatefulWidget {
-  const RootPage({Key? key}) : super(key: key);
+  final User user;
+  const RootPage({Key? key,required this.user}) : super(key: key);
 
   @override
   _RootPageState createState() => _RootPageState();
@@ -21,7 +23,7 @@ class _RootPageState extends State<RootPage> {
   void initState() {
     // TODO: implement initState
     getValidationData().whenComplete(() async{
-        if(username == null || username == " "){
+        if(userid == null){
           Navigator.of(context)
               .pushReplacement(MaterialPageRoute(builder: (_) => PageConnexion()));
         }
@@ -33,23 +35,23 @@ class _RootPageState extends State<RootPage> {
 
   Future getValidationData() async{
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    var userName = sharedPreferences.getString("userName");
+    var userId = sharedPreferences.getInt("userId");
     setState(() {
-      username = userName;
+      userid = userId;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var user_name = username;
+    User current = widget.user;
     return Scaffold(
       body: IndexedStack(
         index: pageIndex,
         children: [
-        PageTransaction(userName: user_name),
-        PagePortefeuille(userName: user_name),
-        PageStats(userName: user_name),
-        PageParametre(userName: user_name)
+        PageTransaction(currentUser: current),
+        PagePortefeuille(currentUser: current),
+        PageStats(currentUser: current),
+        PageParametre(currentUser: current)
         ],
       ),
 

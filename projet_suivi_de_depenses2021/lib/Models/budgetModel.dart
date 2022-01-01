@@ -1,43 +1,49 @@
-class TransactionModel {
+class BudgetModel {
   int? id;
-  DateTime? datetime;
+  String? titre;
   String? description;
   num? montant;
-  String? type;
+  num? restant;
+  DateTime? date_debut;
+  DateTime? date_fin;
   int? user_id;
-  int? compte_id;
   int? cat_id;
 
-  TransactionModel(
-      this.datetime,
+  BudgetModel(
+      //this.id,
+      this.titre,
       this.description,
       this.montant,
-      this.type,
+      this.restant,
+      this.date_debut,
+      this.date_fin,
       this.user_id,
-      this.compte_id,
       this.cat_id,
       );
 
-  TransactionModel.fromMap(dynamic obj) {
+  BudgetModel.fromMap(dynamic obj) {
     this.id = obj['id'];
-    this.datetime = DateTime.parse(obj["datetime"]);
+    this.titre = obj["titre"];
     this.description = obj["description"];
     this.montant = obj["montant"];
-    this.type = obj["type"];
+    this.restant = obj["restant"];
+    this.date_debut = DateTime.parse(obj["date_debut"]);
+    this.date_fin = DateTime.parse(obj["date_fin"]);
     this.user_id = obj["user_id"];
-    this.compte_id = obj["compte_id"];
     this.cat_id = obj["cat_id"];
   }
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
+
     map["id"] = id;
-    map["datetime"] = datetime!.toIso8601String();
+    map["titre"] = titre;
     map["description"] = description;
     map["montant"] = montant;
-    map["type"] = type;
+    map["restant"] = restant;
+    map["date_debut"] = date_debut!.toIso8601String();
+    map["date_fin"] = date_fin!.toIso8601String();
     map["user_id"] = user_id;
-    map["compte_id"] = compte_id;
     map["cat_id"] = cat_id;
 
     return map;
@@ -45,11 +51,12 @@ class TransactionModel {
 
   //Getters
   int? get getId => id;
-  DateTime? get getdatetime => datetime;
+  String? get getTitre => titre;
   String? get getDescription => description;
   num? get getMontant => montant;
-  String? get getType => type;
+  num? get getRestant => restant;
+  DateTime? get getDateDebut => date_debut;
+  DateTime? get getDateFin => date_fin;
   int? get getUserId => user_id;
-  int? get getCompteId => compte_id;
   int? get getCatId => cat_id;
 }

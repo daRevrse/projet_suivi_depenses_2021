@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:projet_suivi_de_depenses2021/Database/user_operations.dart';
 import 'package:projet_suivi_de_depenses2021/pages/page_connexion.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_creation/nouvelle_transaction.dart';
 import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_list/page_list_transactions.dart';
 import 'package:projet_suivi_de_depenses2021/pages/root_app_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Models/userModel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +37,8 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-var username;
+User? user;
+var userId;
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -41,13 +46,16 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+  UserOperations userOperations = UserOperations();
+
   @override
   void initState() {
     // TODO: implement initState
     getValidationData().whenComplete(() async{
       Timer(Duration(seconds: 3), () {
         Navigator.of(context)
-            .pushReplacement(MaterialPageRoute(builder: (_) => (username == null || username == "" ? PageConnexion() : RootPage())));
+            .pushReplacement(MaterialPageRoute(builder: (_) => (userId == null ? PageConnexion() : RootPage(user: user!,))));
       });
     });
     super.initState();
@@ -55,10 +63,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future getValidationData() async{
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    var userName = sharedPreferences.getString("userName");
+    var _userId = sharedPreferences.getInt("userId");
     setState(() {
-      username = userName;
+      userId = _userId;
     });
+    User _user = await userOperations.getUser(userId);
+    setState(() {
+      user = _user;
+    });
+
 
   }
 

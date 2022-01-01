@@ -5,15 +5,18 @@ import 'package:projet_suivi_de_depenses2021/Database/compte_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Database/transactions_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Models/compteModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/transactionModel.dart';
+import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_affichage/page_afficher_transaction.dart';
 import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_creation/nouvelle_transaction.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_creation/nouvelle_transaction_via_acceuil.dart';
 import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_list/page_list_transactions.dart';
 import 'package:collection/collection.dart';
 
 
 class PageTransaction extends StatefulWidget {
-  final String userName;
-  const PageTransaction({Key? key,required this.userName}) : super(key: key);
+  final User currentUser;
+  const PageTransaction({Key? key,required this.currentUser}) : super(key: key);
 
 
   @override
@@ -31,11 +34,13 @@ class _PageTransactionState extends State<PageTransaction> {
   num somme = 0;
 
   void calcTotal() async {
-    var total_sum = (await compteOperations.getSomme())[0]['TOTAL'];
+    var total_sum = (await compteOperations.getSomme(widget.currentUser))[0]['TOTAL'];
 
-    print(total_sum);
+    //print(total_sum);
     setState(() {
+      if(total_sum!=null)
       somme = total_sum;
+      else somme = 0;
     });
   }
 
@@ -56,14 +61,14 @@ class _PageTransactionState extends State<PageTransaction> {
         preferredSize: Size.fromHeight(80),
         child: AppBar(
             automaticallyImplyLeading: false,
-            title: FittedBox(child: Text('${widget.userName}'),alignment: Alignment.center,),
+            title: FittedBox(child: Text('${widget.currentUser.nom}'),alignment: Alignment.center,),
             titleTextStyle: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),
             backgroundColor: Colors.teal,
             actions: [
               IconButton(
                   padding: EdgeInsets.only(right: 10,top: 5),
                   onPressed: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> ListeTransactions()));
+                    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> ListeTransactions(user: widget.currentUser,periode: "Tous",)));
                   }, icon: Icon(Icons.article_outlined ,size: 30,))],
             bottom: PreferredSize(
               preferredSize: Size.fromHeight(80),
@@ -152,7 +157,7 @@ class _PageTransactionState extends State<PageTransaction> {
 
             Container(
               child: FutureBuilder<List<TransactionModel>?>(
-                  future: transactionOperations.getTransactionModelData(),
+                  future: transactionOperations.getTransactionsByDate(widget.currentUser,date),
                   builder: (BuildContext context,
                       AsyncSnapshot<List<TransactionModel>?> snapshot) {
                     if (!snapshot.hasData) {
@@ -185,7 +190,7 @@ class _PageTransactionState extends State<PageTransaction> {
                           return Card(
                               elevation: 5,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                              color: Colors.white,
+                              color: trans.type == "Revenu" ? Colors.green[50] : Colors.red[50],
                               child: Padding(
                                 padding: const EdgeInsets.all(4.0),
                                 child: Container(
@@ -197,18 +202,24 @@ class _PageTransactionState extends State<PageTransaction> {
                                   ),
                                   child: ListTile(
                                     leading: Icon(Icons.swap_horiz),
-                                    title: Text('${trans.titre}'),
-                                    subtitle: Text('${trans.description}'),
+                                    title: Text('${trans.description}'),
+                                    subtitle: Text('${trans.type}'),
                                     trailing: Column(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
-                                        Text('${trans.montant}'),
+                                        Text(
+                                          trans.type == "Revenu" ? '+${trans.montant}' : '-${trans.montant}',style: TextStyle(color: trans.type == "Revenu" ? Colors.green[900] : Colors.red[900]),
+                                        ),
                                         Padding(
                                           padding: EdgeInsets.only(bottom: 10),
-                                          child: Text('${trans.type}'),
+                                          child: Text('${trans.datetime!.hour}:${trans.datetime!.minute}'),
                                         )
                                       ],
                                     ),
+                                    onTap: (){
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,)));
+                                    },
                                   ),
                                 ),
                               ),
@@ -224,7 +235,7 @@ class _PageTransactionState extends State<PageTransaction> {
 
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> NewTransaction()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> NewTransactionViaAcceuil(user: widget.currentUser,)));
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.teal,

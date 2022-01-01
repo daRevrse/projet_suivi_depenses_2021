@@ -8,21 +8,23 @@ import 'package:projet_suivi_de_depenses2021/Models/categorieModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/compteModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/transactionModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_affichage/page_afficher_compte.dart';
 import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_list/page_list_transactions.dart';
 
 
 DateTime date = DateTime.now();
 TimeOfDay time = TimeOfDay.fromDateTime(date);
 
-class NewTransaction extends StatefulWidget {
+class NewTransactionViaCompte extends StatefulWidget {
   final User user;
-  const NewTransaction({Key? key,required this.user}) : super(key: key);
+  final CompteModel compte;
+  const NewTransactionViaCompte({Key? key,required this.user,required this.compte}) : super(key: key);
 
   @override
-  _NewTransaction createState() => _NewTransaction();
+  _NewTransactionViaCompte createState() => _NewTransactionViaCompte();
 }
 
-class _NewTransaction extends State<NewTransaction> {
+class _NewTransactionViaCompte extends State<NewTransactionViaCompte> {
 
   TransactionOperations transactionOperations = TransactionOperations();
   CompteOperations compteOperations = CompteOperations();
@@ -40,7 +42,6 @@ class _NewTransaction extends State<NewTransaction> {
 
   CompteModel? compte;
   CategorieModel? categorie;
-  String defaultCptHintText = "Selectionner un compte";
   String defaultCatRHintText = "Selectionner une catégorie";
   String defaultCatDHintText = "Selectionner une catégorie";
 
@@ -48,6 +49,10 @@ class _NewTransaction extends State<NewTransaction> {
   void initState() {
     dateRController.text = DateFormat.yMd().format(date);
     dateDController.text = DateFormat.yMd().format(date);
+
+    setState(() {
+      compte = widget.compte;
+    });
     // TODO: implement initState
     super.initState();
   }
@@ -150,8 +155,8 @@ class _NewTransaction extends State<NewTransaction> {
 
                               onPressed: (){
                                 showTimePicker(
-                                    context: context,
-                                    initialTime: time,
+                                  context: context,
+                                  initialTime: time,
                                 ).then((value) {
                                   setState(() {
                                     time = value!;
@@ -196,30 +201,6 @@ class _NewTransaction extends State<NewTransaction> {
                             keyboardType: TextInputType.number,
                           ),
                         ),
-                        FutureBuilder<List<CompteModel>?>(
-                            future: compteOperations.getCompteByUser(widget.user),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<List<CompteModel>?> snapshot) {
-                              if (!snapshot.hasData) return CircularProgressIndicator();
-                              return DropdownButton<CompteModel>(
-                                items: snapshot.data!
-                                    .map((_compte) => DropdownMenuItem<CompteModel>(
-                                  child: Text("${_compte.nom} : ${_compte.montant} Fcfa"),
-                                  value: _compte,
-                                ))
-                                    .toList(),
-                                onChanged: (CompteModel? value) {
-                                  setState(() {
-                                    compte = value;
-                                    defaultCptHintText = compte!.nom!;
-                                  });
-                                },
-                                isExpanded: false,
-                                //value: _currentUser,
-                                hint: Text('${defaultCptHintText}'),
-                                dropdownColor: Colors.white,
-                              );
-                            }),
 
                         FutureBuilder<List<CategorieModel>?>(
                             future: autreOperations.getCatByType("Revenu",widget.user),
@@ -265,7 +246,7 @@ class _NewTransaction extends State<NewTransaction> {
                               Container(width: 30,),
                               ElevatedButton(
                                 onPressed: () async {
-                                  TransactionModel trans = TransactionModel(date, descRController.text, int.parse(montantRController.text), "Revenu",widget.user.id,compte!.id,categorie!.id);
+                                  TransactionModel trans = TransactionModel(date, descRController.text, int.parse(montantRController.text), "Revenu",widget.user.id,widget.compte.id,categorie!.id);
                                   await transactionOperations.saveTransaction(trans);
 
                                   setState(() {
@@ -276,7 +257,7 @@ class _NewTransaction extends State<NewTransaction> {
 
                                   await compteOperations.updateCompte(compte!);
 
-                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> ListeTransactions(user: widget.user,periode: "Tous",)));
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> PageCompte(currentUser: widget.user,currentCompte: widget.compte,)));
 
                                 },
                                 child: Text("Enregistrer"),)
@@ -356,7 +337,6 @@ class _NewTransaction extends State<NewTransaction> {
                                       keyboardType: TextInputType.name,
                                     ),
                                   ),
-                                  //Text(DateFormat.yMd().format(date),style: TextStyle(decoration: TextDecoration.underline),),
                                   Icon(Icons.alarm)
                                 ],
                               ),
@@ -409,31 +389,6 @@ class _NewTransaction extends State<NewTransaction> {
                           ),
                         ),
 
-                        FutureBuilder<List<CompteModel>?>(
-                            future: compteOperations.getCompteByUser(widget.user),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<List<CompteModel>?> snapshot) {
-                              if (!snapshot.hasData) return CircularProgressIndicator();
-                              return DropdownButton<CompteModel>(
-                                items: snapshot.data!
-                                    .map((_compte) => DropdownMenuItem<CompteModel>(
-                                  child: Text("${_compte.nom} : ${_compte.montant} Fcfa"),
-                                  value: _compte,
-                                ))
-                                    .toList(),
-                                onChanged: (CompteModel? value) {
-                                  setState(() {
-                                    compte = value;
-                                    defaultCptHintText = compte!.nom!;
-                                  });
-                                },
-                                isExpanded: false,
-                                //value: _currentUser,
-                                hint: Text('${defaultCptHintText}'),
-                                dropdownColor: Colors.white,
-                              );
-                            }),
-
                         FutureBuilder<List<CategorieModel>?>(
                             future: autreOperations.getCatByType("Dépense",widget.user),
                             builder: (BuildContext context,
@@ -476,7 +431,7 @@ class _NewTransaction extends State<NewTransaction> {
                               Container(width: 30,),
                               ElevatedButton(
                                 onPressed: () async {
-                                  TransactionModel trans = TransactionModel(date, descDController.text, int.parse(montantDController.text), "Dépense",widget.user.id,compte!.id,categorie!.id);
+                                  TransactionModel trans = TransactionModel(date, descDController.text, int.parse(montantDController.text), "Dépense",widget.user.id,widget.compte.id,categorie!.id);
                                   await transactionOperations.saveTransaction(trans);
 
                                   setState(() {
@@ -487,7 +442,7 @@ class _NewTransaction extends State<NewTransaction> {
 
                                   await compteOperations.updateCompte(compte!);
 
-                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> ListeTransactions(user: widget.user,periode: "Tous",)));
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> PageCompte(currentUser: widget.user,currentCompte: widget.compte,)));
 
                                 },
                                 child: Text("Enregistrer"),)

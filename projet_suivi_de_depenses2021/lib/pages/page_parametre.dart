@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
 import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_creation/nouveau_budget.dart';
 import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_creation/nouvelle_categorie.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_list/page_list_budgets.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_list/page_list_dette.dart';
 import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_updates/profil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'page_connexion.dart';
 
 class PageParametre extends StatefulWidget {
-  final String userName;
-  const PageParametre({Key? key,required this.userName}) : super(key: key);
+  final User currentUser;
+  const PageParametre({Key? key,required this.currentUser}) : super(key: key);
   @override
   _PageParametreState createState() => _PageParametreState();
 }
@@ -23,7 +26,7 @@ class _PageParametreState extends State<PageParametre> {
         preferredSize: Size.fromHeight(80),
         child: AppBar(
             automaticallyImplyLeading: false,
-            title: FittedBox(child: Text('${widget.userName}'),alignment: Alignment.center,),
+            title: FittedBox(child: Text('${widget.currentUser.nom}'),alignment: Alignment.center,),
             titleTextStyle: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),
             backgroundColor: Colors.teal,
             //actions: [IconButton(onPressed: (){}, icon: Icon(Icons.calendar_today))],
@@ -59,7 +62,7 @@ class _PageParametreState extends State<PageParametre> {
                         style: ButtonStyle(
                         ),
                         onPressed:(){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> Profil()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> Profil(user: widget.currentUser,)));
                         } ,
                         child: Container(
                           width: double.infinity,
@@ -82,7 +85,7 @@ class _PageParametreState extends State<PageParametre> {
                         style: ButtonStyle(
                         ),
                         onPressed:(){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> NewBudget()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> ListeBudgets(user: widget.currentUser,)));
                         } ,
                         child: Container(
                           width: double.infinity,
@@ -105,7 +108,7 @@ class _PageParametreState extends State<PageParametre> {
                         style: ButtonStyle(
                         ),
                         onPressed:(){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> categorie()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> Categorie(currentUser: widget.currentUser,)));
                         } ,
                         child: Container(
                           width: double.infinity,
@@ -128,8 +131,29 @@ class _PageParametreState extends State<PageParametre> {
                         style: ButtonStyle(
                         ),
                         onPressed:(){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> Profil()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> ListeDettes(user: widget.currentUser)));
                         } ,
+                        child: Container(
+                          width: double.infinity,
+                          child: Text('Dettes',
+                              style:TextStyle(
+                                color: Colors.black,
+                              )
+
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          height: 2,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      TextButton(
+                        style: ButtonStyle(
+                        ),
+                        onPressed:(){} ,
                         child: Container(
                           width: double.infinity,
                           child: Text('Donnez nous une note',
@@ -151,7 +175,7 @@ class _PageParametreState extends State<PageParametre> {
                         onPressed:() {
                           setState(() async {
                             final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                            sharedPreferences.remove("userName");
+                            sharedPreferences.clear();
                             Navigator.of(context)
                                 .pushReplacement(MaterialPageRoute(builder: (_) => PageConnexion()));
                           });

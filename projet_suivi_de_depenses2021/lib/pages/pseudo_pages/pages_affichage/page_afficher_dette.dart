@@ -1,48 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:projet_suivi_de_depenses2021/Constants/popMenuConsts.dart';
-import 'package:projet_suivi_de_depenses2021/Database/compte_operations.dart';
+import 'package:projet_suivi_de_depenses2021/Database/autre_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Database/transactions_operations.dart';
-import 'package:projet_suivi_de_depenses2021/Models/compteModel.dart';
-import 'package:projet_suivi_de_depenses2021/Models/transactionModel.dart';
+import 'package:projet_suivi_de_depenses2021/Models/detteModel.dart';
+import 'package:projet_suivi_de_depenses2021/Models/remboursementModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
-import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_affichage/page_afficher_transaction.dart';
-import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_creation/nouvelle_transaction_via_compte.dart';
-import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_updates/compte_update.dart';
-
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_creation/nouveau_remboursement.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_updates/dette_update.dart';
 import '../../root_app_page.dart';
 
-class PageCompte extends StatefulWidget {
-  final CompteModel currentCompte;
+class PageDette extends StatefulWidget {
+  final DetteModel currentDette;
   final User currentUser;
-  const PageCompte({Key? key,required this.currentCompte,required this.currentUser}) : super(key: key);
+  const PageDette({Key? key,required this.currentDette,required this.currentUser}) : super(key: key);
 
   @override
-  _PageCompteState createState() => _PageCompteState();
+  _PageDetteState createState() => _PageDetteState();
 }
 
-class _PageCompteState extends State<PageCompte> {
+class _PageDetteState extends State<PageDette> {
 
   TransactionOperations transactionOperations = TransactionOperations();
-  CompteOperations compteOperations = CompteOperations();
-  int totalRev = 0;
-  int totalDep = 0;
+  AutreOperations autreOperations = AutreOperations();
+
+  num restant = 0;
+
+  void calcRest() async {
+    var total_remb = (await transactionOperations.getRestant(widget.currentUser,widget.currentDette))[0]['TOTAL'];
+
+    //print(total_sum);
+    setState(() {
+      if(total_remb!=null) {
+        restant = widget.currentDette.montant!;
+      } else {
+        restant = widget.currentDette.montant! - total_remb;
+
+      }
+    });
+
+    DetteModel _dette = DetteModel(widget.currentDette.creancier, widget.currentDette.description, widget.currentDette.montant, restant, widget.currentDette.datetime, widget.currentDette.user_id);
+
+    await autreOperations.updateDette(_dette);
+  }
 
   @override
   void initState() {
-    refresh();
     // TODO: implement initState
     super.initState();
-
+    calcRest();
   }
 
-  Future refresh()async{
-     int _totalRev = (await transactionOperations.getCountByTypeByCompte("Revenu",widget.currentUser,widget.currentCompte))!;
-     int _totalDep = (await transactionOperations.getCountByTypeByCompte("Dépense",widget.currentUser,widget.currentCompte))!;
-     setState(() {
-       totalRev = _totalRev;
-       totalDep = _totalDep;
-     });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,17 +63,11 @@ class _PageCompteState extends State<PageCompte> {
             }, icon: Icon(Icons.arrow_back),color: Colors.white,),
             backgroundColor: Colors.teal,
             actions: [
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: (){
-                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> NewTransactionViaCompte(user: widget.currentUser,compte: widget.currentCompte,)));
-                },
-              ),
               PopupMenuButton<String>(
                 icon: Icon(Icons.settings),
                 onSelected: choiceAction,
                 itemBuilder: (BuildContext context){
-                  return PopMenu.choices.map((String choice){
+                  return PopMenuRemboursement.choices.map((String choice){
                     return PopupMenuItem<String>(
                       value: choice,
                       child: Text(choice),
@@ -98,8 +99,8 @@ class _PageCompteState extends State<PageCompte> {
                               padding: const EdgeInsets.only(top: 10),
                               child: CircleAvatar(
                                 radius: 40,
-                                backgroundColor: Color(widget.currentCompte.color!),
-                                child: Text(widget.currentCompte.nom![0],
+                                backgroundColor: Colors.black,
+                                child: Text(widget.currentDette.creancier![0],
                                     style: TextStyle(
                                       fontSize: 40,
                                       color: Colors.white,
@@ -108,15 +109,11 @@ class _PageCompteState extends State<PageCompte> {
                             ),
                             Padding(
                               padding: EdgeInsets.only(top: 5,bottom: 5),
-                              child: Text('${widget.currentCompte.nom}',style: TextStyle(
-                                fontSize: 20,
-                              )),
+                              child: Text('${widget.currentDette.creancier}'),
                             ),
                             Padding(
                               padding: EdgeInsets.only(top: 5,bottom: 5),
-                              child: Text("${widget.currentCompte.montant} Fcfa",style: TextStyle(
-                                fontSize: 25,
-                              )),
+                              child: Text("${widget.currentDette.description}"),
                             ),
                           ],
                         ),
@@ -127,8 +124,8 @@ class _PageCompteState extends State<PageCompte> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Revenus"),
-                          Text("${totalRev} Transactions",style: TextStyle(color: Colors.green),)
+                          Text("Départ"),
+                          Text("${widget.currentDette.montant} FCFA",style: TextStyle(color: Colors.black),)
                         ],
                       ),
                     ),
@@ -137,8 +134,18 @@ class _PageCompteState extends State<PageCompte> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Dépenses"),
-                          Text("${totalDep} Transactions",style: TextStyle(color: Colors.red),)
+                          Text("Restant"),
+                          Text("${widget.currentDette.restant} FCFA",style: TextStyle(color: Colors.red),)
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Date"),
+                          Text("${widget.currentDette.datetime!.day}/${widget.currentDette.datetime!.month}/${widget.currentDette.datetime!.year} ",style: TextStyle(color: Colors.black),)
                         ],
                       ),
                     )
@@ -147,10 +154,10 @@ class _PageCompteState extends State<PageCompte> {
                 ,
               ),
               Container(
-                child: FutureBuilder<List<TransactionModel>?>(
-                    future: transactionOperations.getTransactionsByCompte(widget.currentUser,widget.currentCompte),
+                child: FutureBuilder<List<RemboursementModel>?>(
+                    future: transactionOperations.getRemboursementsByDette(widget.currentUser,widget.currentDette),
                     builder: (BuildContext context,
-                        AsyncSnapshot<List<TransactionModel>?> snapshot) {
+                        AsyncSnapshot<List<RemboursementModel>?> snapshot) {
                       if (!snapshot.hasData) {
                         return Center(child: Container(
                           child: Column(
@@ -177,7 +184,7 @@ class _PageCompteState extends State<PageCompte> {
                             : ListView(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          children: snapshot.data!.map((trans) {
+                          children: snapshot.data!.map((remb) {
                             return Card(
                               elevation: 5,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
@@ -193,21 +200,20 @@ class _PageCompteState extends State<PageCompte> {
                                   ),
                                   child: ListTile(
                                     leading: Icon(Icons.swap_horiz),
-                                    title: Text('${trans.description}'),
-                                    subtitle: Text('${trans.type}'),
+                                    title: Text('Remboursement'),
                                     trailing: Column(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
-                                        Text('${trans.montant}'),
+                                        Text('${remb.montant}'),
                                         Padding(
                                           padding: EdgeInsets.only(bottom: 10),
-                                          child: Text('${trans.datetime!.day}-${trans.datetime!.month}-${trans.datetime!.year} ${trans.datetime!.hour}:${trans.datetime!.minute}'),
+                                          child: Text('${remb.datetime!.day}-${remb.datetime!.month}-${remb.datetime!.year} ${remb.datetime!.hour}:${remb.datetime!.minute}'),
                                         )
                                       ],
                                     ),
                                     onTap: (){
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,)));
+                                      //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,)));
                                     },
                                   ),
                                 ),
@@ -225,28 +231,32 @@ class _PageCompteState extends State<PageCompte> {
   }
 
   void choiceAction(String choice){
-    if(choice == PopMenu.Modifier){
-      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> ModifierCompte(compte: widget.currentCompte,user: widget.currentUser,)));
-    }else if(choice == PopMenu.Supprimer){
+    if(choice == PopMenuRemboursement.Rembourser){
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> NewRemboursement(dette: widget.currentDette,user: widget.currentUser,)));
+    }
+    else if(choice == PopMenuRemboursement.Modifier){
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> ModifierDette(dette: widget.currentDette,user: widget.currentUser,)));
+    }
+    else if(choice == PopMenuRemboursement.Supprimer){
       showDialog<String>(
           context: context,
           builder: (BuildContext context) => AlertDialog(
-        title: const Text('Supprimer ce compte?'),
-        content: const Text('Etes-vous vraiment sûre?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'Non'),
-            child: const Text('Non'),
-          ),
-          TextButton(
-            onPressed: ()async {
-              await compteOperations.deleteCompte(widget.currentCompte.id);
-              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> RootPage(user: widget.currentUser,)));
-            },
-            child: const Text('Oui'),
-          ),
-        ],
-      )
+            title: const Text('Supprimer cette dette?'),
+            content: const Text('Etes-vous vraiment sûre?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Non'),
+                child: const Text('Non'),
+              ),
+              TextButton(
+                onPressed: ()async {
+                  await autreOperations.deleteDette(widget.currentDette.id);
+                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> RootPage(user: widget.currentUser,)));
+                },
+                child: const Text('Oui'),
+              ),
+            ],
+          )
       );
     }
   }

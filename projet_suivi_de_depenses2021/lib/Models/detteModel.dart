@@ -1,26 +1,29 @@
-class CompteModel {
+class DetteModel {
   int? id;
-  String? nom;
+  String? creancier;
   String? description;
   num? montant;
-  int? color;
+  num? restant;
+  DateTime? datetime;
   int? user_id;
 
-  CompteModel(
+  DetteModel(
       //this.id,
-      this.nom,
+      this.creancier,
       this.description,
       this.montant,
-      this.color,
+      this.restant,
+      this.datetime,
       this.user_id,
       );
 
-  CompteModel.fromMap(dynamic obj) {
+  DetteModel.fromMap(dynamic obj) {
     this.id = obj['id'];
-    this.nom = obj["nom"];
+    this.creancier = obj["creancier"];
     this.description = obj["description"];
     this.montant = obj["montant"];
-    this.color = obj["color"];
+    this.restant = obj["restant"];
+    this.datetime = DateTime.parse(obj["datetime"]);
     this.user_id = obj["user_id"];
   }
 
@@ -28,10 +31,11 @@ class CompteModel {
     var map = new Map<String, dynamic>();
 
     map["id"] = id;
-    map["nom"] = nom;
+    map["creancier"] = creancier;
     map["description"] = description;
     map["montant"] = montant;
-    map["color"] = color;
+    map["restant"] = restant;
+    map["datetime"] = datetime!.toIso8601String();
     map["user_id"] = user_id;
 
     return map;
@@ -39,9 +43,10 @@ class CompteModel {
 
   //Getters
   int? get getId => id;
-  String? get getNom => nom;
+  String? get getCreancier => creancier;
   String? get getDescription => description;
   num? get getMontant => montant;
-  int? get getColor => color;
+  num? get getRestant => restant;
+  DateTime? get getDatetime => datetime;
   int? get getUserId => user_id;
 }

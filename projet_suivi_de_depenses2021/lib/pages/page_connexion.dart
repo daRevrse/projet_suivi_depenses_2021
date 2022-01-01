@@ -18,10 +18,9 @@ class _PageConnexion extends State<PageConnexion> {
 
   UserOperations userOperations = UserOperations();
   TextEditingController controller = TextEditingController();
-  
- /* void _goToRoot(context,String userName) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => RootPage(value: userName,)));
-  }*/
+  bool check = false;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +72,7 @@ class _PageConnexion extends State<PageConnexion> {
                               ),
                               hintText: 'Votre nom',
                               helperText: "Ex: Kodjo, Afi, Ashley...",
+                              errorText: check ? "Veuillez entrez un nom" : null,
                             ),
                             keyboardType: TextInputType.name,
                             onSubmitted: (val) => controller.text = val,
@@ -86,22 +86,29 @@ class _PageConnexion extends State<PageConnexion> {
                                   primary: Colors.white
                               ),
                               onPressed: () async {
-                                /*List<User> users = await DatabaseHelper.instance.getUsers();
-                                String userName = users.first.nom;
-                                _goToRoot(context, userName);*/
+                                var _id = await userOperations.getCount();
 
-                              if (controller.text != " ") {
+                              if (controller.text.isNotEmpty) {
 
-                                final user = User(
-                                    nom: controller.text);
+                                final User user = User(controller.text);
+
+                                setState(() {
+                                  user.id = _id;
+                                });
+
                                 userOperations.add(user);
 
                                 final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                                sharedPreferences.setString("userName", user.nom);
+                                sharedPreferences.setString("userName", user.nom!);
+                                sharedPreferences.setInt("userId", user.id!);
 
                                 Navigator.of(context)
-                                    .pushReplacement(MaterialPageRoute(builder: (_) => PageSolde(userName: user.nom)));
-                              }
+                                    .pushReplacement(MaterialPageRoute(builder: (_) => PageSolde(user: user)));
+                              }else {
+                                setState(() {
+                                check = true;
+                              });
+                              };
 
                               },
                               child: Row(

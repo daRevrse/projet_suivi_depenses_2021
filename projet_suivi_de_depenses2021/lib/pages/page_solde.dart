@@ -1,13 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:projet_suivi_de_depenses2021/Database/autre_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Database/compte_operations.dart';
+import 'package:projet_suivi_de_depenses2021/Models/categorieModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/compteModel.dart';
+import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
 import 'package:projet_suivi_de_depenses2021/pages/root_app_page.dart';
 
 class PageSolde extends StatefulWidget {
-  final String userName;
-  const PageSolde({Key? key,required this.userName}) : super(key: key);
+  final User user;
+  const PageSolde({Key? key,required this.user}) : super(key: key);
 
   @override  
   _PageSolde createState() => _PageSolde();
@@ -16,6 +19,7 @@ class PageSolde extends StatefulWidget {
 class _PageSolde extends State<PageSolde> {
 
   CompteOperations compteOperations = CompteOperations();
+  AutreOperations autreOperations = AutreOperations();
   TextEditingController controller = TextEditingController();
 
     @override
@@ -71,19 +75,13 @@ class _PageSolde extends State<PageSolde> {
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.white,
                               ),
-                              onPressed: () async {
+                              onPressed: (){
 
-                                CompteModel compte = CompteModel("Espèce"," ",int.parse(controller.text));
-                                CompteModel com_pte = CompteModel("Banque"," ",0);
-                                CompteModel com__pte = CompteModel("Epargne"," ",0);
-                                await compteOperations.saveCompte(compte);
-                                await compteOperations.saveCompte(com_pte);
-                                await compteOperations.saveCompte(com__pte);
-
-
+                                loadPortefeuille();
+                                loadCategories();
 
                                 Navigator.of(context)
-                                    .pushReplacement(MaterialPageRoute(builder: (_) => RootPage()));
+                                    .pushReplacement(MaterialPageRoute(builder: (_) => RootPage(user: widget.user,)));
                               },
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -109,5 +107,78 @@ class _PageSolde extends State<PageSolde> {
           )
       );
     }
+
+  loadPortefeuille(){
+      if(controller.text.isEmpty){
+        CompteModel compte = CompteModel("Espèce"," ",0,Colors.green.value,widget.user.id);
+        CompteModel com_pte = CompteModel("Banque"," ",0,Colors.blue.value,widget.user.id);
+        CompteModel com__pte = CompteModel("Epargne"," ",0,Colors.red.value,widget.user.id);
+        compteOperations.saveCompte(compte);
+        compteOperations.saveCompte(com_pte);
+        compteOperations.saveCompte(com__pte);
+      }else{
+        CompteModel compte = CompteModel("Espèce"," ",int.parse(controller.text),Colors.green.value,widget.user.id);
+        CompteModel com_pte = CompteModel("Banque"," ",0,Colors.blue.value,widget.user.id);
+        CompteModel com__pte = CompteModel("Epargne"," ",0,Colors.red.value,widget.user.id);
+        compteOperations.saveCompte(compte);
+        compteOperations.saveCompte(com_pte);
+        compteOperations.saveCompte(com__pte);
+      }
   }
+
+    loadCategories(){
+
+      CategorieModel cat_al = CategorieModel("Alimentation", "Dépense", Colors.green.value, widget.user.id);
+      CategorieModel cat_uti = CategorieModel("Utilitaire", "Dépense", Colors.blueGrey.value, widget.user.id);
+      CategorieModel cat_vet = CategorieModel("Vêtement", "Dépense", Colors.deepPurpleAccent.value, widget.user.id);
+      CategorieModel cat_edu = CategorieModel("Education", "Dépense", Colors.limeAccent.value, widget.user.id);
+      CategorieModel cat_div = CategorieModel("Divertissement", "Dépense", Colors.pink.value, widget.user.id);
+      CategorieModel cat_spo = CategorieModel("Sport", "Dépense", Colors.orange.value, widget.user.id);
+      CategorieModel cat_cad = CategorieModel("Cadeau", "Dépense", Colors.indigo.value, widget.user.id);
+      CategorieModel cat_san = CategorieModel("Santé", "Dépense", Colors.red.value, widget.user.id);
+      CategorieModel cat_tra = CategorieModel("Transport", "Dépense", Colors.tealAccent.value, widget.user.id);
+      CategorieModel cat_voy = CategorieModel("Voyage", "Dépense", Colors.brown.value, widget.user.id);
+      CategorieModel cat_ach = CategorieModel("Achat", "Dépense", Colors.yellow.value, widget.user.id);
+      CategorieModel cat_ent = CategorieModel("Entretien", "Dépense", Colors.deepPurple.value, widget.user.id);
+      CategorieModel cat_per = CategorieModel("Perte", "Dépense", Colors.cyanAccent.value, widget.user.id);
+      CategorieModel cat_au = CategorieModel("Autre", "Dépense", Colors.grey.value, widget.user.id);
+
+
+      CategorieModel cat_sal = CategorieModel("Salaire", "Revenu", Colors.blueAccent.value, widget.user.id);
+      CategorieModel cat_cou = CategorieModel("Coupon", "Revenu", Colors.deepOrangeAccent.value, widget.user.id);
+      CategorieModel cat_pri = CategorieModel("Prix", "Revenu", Colors.indigoAccent.value, widget.user.id);
+      CategorieModel cat_prim = CategorieModel("Prime", "Revenu", Colors.greenAccent.value, widget.user.id);
+      CategorieModel cat_divi = CategorieModel("Dividende", "Revenu", Colors.limeAccent.value, widget.user.id);
+      CategorieModel cat_Inv = CategorieModel("Investissement", "Revenu", Colors.amberAccent.value, widget.user.id);
+      CategorieModel cat_lot = CategorieModel("Lotterie", "Revenu", Colors.cyanAccent.value, widget.user.id);
+      CategorieModel cat_rem = CategorieModel("Remboursemment", "Revenu", Colors.redAccent.value, widget.user.id);
+      CategorieModel cat_aut = CategorieModel("Autre", "Revenu", Colors.grey.value, widget.user.id);
+
+
+      autreOperations.saveCat(cat_al);
+      autreOperations.saveCat(cat_aut);
+      autreOperations.saveCat(cat_au);
+      autreOperations.saveCat(cat_lot);
+      autreOperations.saveCat(cat_rem);
+      autreOperations.saveCat(cat_divi);
+      autreOperations.saveCat(cat_Inv);
+      autreOperations.saveCat(cat_cou);
+      autreOperations.saveCat(cat_pri);
+      autreOperations.saveCat(cat_prim);
+      autreOperations.saveCat(cat_ent);
+      autreOperations.saveCat(cat_per);
+      autreOperations.saveCat(cat_sal);
+      autreOperations.saveCat(cat_ach);
+      autreOperations.saveCat(cat_cad);
+      autreOperations.saveCat(cat_div);
+      autreOperations.saveCat(cat_san);
+      autreOperations.saveCat(cat_spo);
+      autreOperations.saveCat(cat_tra);
+      autreOperations.saveCat(cat_voy);
+      autreOperations.saveCat(cat_edu);
+      autreOperations.saveCat(cat_uti);
+      autreOperations.saveCat(cat_vet);
+
+    }
+}
 

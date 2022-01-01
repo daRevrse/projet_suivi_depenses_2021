@@ -8,21 +8,23 @@ import 'package:projet_suivi_de_depenses2021/Models/categorieModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/compteModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/detteModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
+import 'package:projet_suivi_de_depenses2021/pages/pseudo_pages/pages_affichage/page_afficher_budget.dart';
 import 'package:projet_suivi_de_depenses2021/pages/root_app_page.dart';
 
 DateTime dateD = DateTime.now();
 DateTime dateF = DateTime.now();
 //TimeOfDay time = TimeOfDay.fromDateTime(date);
 
-class NewBudget extends StatefulWidget {
+class ModifierBudget extends StatefulWidget {
   final User user;
-  const NewBudget({Key? key,required this.user}) : super(key: key);
+  final BudgetModel budget;
+  const ModifierBudget({Key? key,required this.user,required this.budget}) : super(key: key);
 
   @override
-  _NewBudget createState() => _NewBudget();
+  _ModifierBudget createState() => _ModifierBudget();
 }
 
-class _NewBudget extends State<NewBudget> {
+class _ModifierBudget extends State<ModifierBudget> {
 
   AutreOperations autreOperations = AutreOperations();
   TextEditingController controller = new TextEditingController();
@@ -33,13 +35,40 @@ class _NewBudget extends State<NewBudget> {
   TextEditingController dateDController = TextEditingController()..text = DateFormat.yMd().format(dateD);
   TextEditingController dateFController = TextEditingController()..text = DateFormat.yMd().format(dateF);
 
-  CategorieModel? categorie;
-  String defaultCatHintText = "Selectionner une catégorie";
+  late CategorieModel? cat;
+
+  num restant = 0;
+
+  Future checking()async{
+    var _cat = await autreOperations.getCatById(widget.budget.cat_id!, widget.user);
+
+    setState(() {
+      cat = _cat;
+    });
+
+    var _trans_dep = (await autreOperations.getSommeBudget(widget.user, cat!.id!,widget.budget.date_debut!,widget.budget.date_fin!))[0]['TOTAL'];
+
+    setState(() {
+      if(_trans_dep!=null) {
+        restant = widget.budget.montant! - _trans_dep;
+      } else {
+        restant = widget.budget.restant!;
+      }
+    });
+  }
 
   @override
   void initState() {
-    dateDController.text = DateFormat.yMd().format(dateD);
-    dateFController.text = DateFormat.yMd().format(dateF);
+
+    restant = widget.budget.restant!;
+
+    titreController.text = widget.budget.titre!;
+    descController.text = widget.budget.description!;
+    montantController.text = widget.budget.montant!.toString();
+    dateDController.text = DateFormat.yMd().format(widget.budget.date_debut!);
+    dateFController.text = DateFormat.yMd().format(widget.budget.date_fin!);
+    dateD = widget.budget.date_debut!;
+    dateF = widget.budget.date_fin!;
     // TODO: implement initState
     super.initState();
   }
@@ -55,13 +84,14 @@ class _NewBudget extends State<NewBudget> {
             elevation: 10,
             color: Colors.white,
             onPressed: () async {
-              BudgetModel budget = BudgetModel(titreController.text,descController.text,int.parse(montantController.text),int.parse(montantController.text),dateD,dateF,widget.user.id,categorie!.id);
-              await autreOperations.saveBudget(budget);
+              //checking();
+              BudgetModel budget = BudgetModel(titreController.text,descController.text,widget.budget.montant,restant,dateD,dateF,widget.user.id,widget.budget.cat_id!);
+              await autreOperations.updateBudget(budget);
 
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> RootPage(user: widget.user,)));
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> PageBudget(currentBudget: widget.budget,currentUser: widget.user,)));
 
             },
-            child: Text("Enregistrer"),
+            child: Text("Modifier"),
           )
 
         ],
@@ -91,6 +121,11 @@ class _NewBudget extends State<NewBudget> {
                         ),
                       ),
                       keyboardType: TextInputType.name,
+                        onChanged: (value){
+                          setState(() {
+                            widget.budget.titre = value;
+                          });
+                        }
                     ),
                   ),
                   Padding(padding: EdgeInsets.only(top: 25),
@@ -107,6 +142,11 @@ class _NewBudget extends State<NewBudget> {
                         ),
                       ),
                       keyboardType: TextInputType.name,
+                        onChanged: (value){
+                          setState(() {
+                            widget.budget.description = value;
+                          });
+                        }
                     ),
                   ),
                   Padding(padding: EdgeInsets.only(top: 25),
@@ -123,6 +163,12 @@ class _NewBudget extends State<NewBudget> {
                         ),
                       ),
                       keyboardType: TextInputType.number,
+                        onChanged: (value){
+                          setState(() {
+                            widget.budget.montant = int.parse(value);
+                            checking();
+                          });
+                        }
                     ),
                   ),
                   Padding(padding: EdgeInsets.only(top: 25,left: 50,right: 50),
@@ -202,31 +248,7 @@ class _NewBudget extends State<NewBudget> {
                         },
 
                       )
-                  ),
-                  FutureBuilder<List<CategorieModel>?>(
-                      future: autreOperations.getCatByType("Dépense",widget.user),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<CategorieModel>?> snapshot) {
-                        if (!snapshot.hasData) return CircularProgressIndicator();
-                        return DropdownButton<CategorieModel>(
-                          items: snapshot.data!
-                              .map((_cat) => DropdownMenuItem<CategorieModel>(
-                            child: Text("${_cat.nom}"),
-                            value: _cat,
-                          ))
-                              .toList(),
-                          onChanged: (CategorieModel? value) {
-                            setState(() {
-                              categorie = value;
-                              defaultCatHintText = categorie!.nom!;
-                            });
-                          },
-                          isExpanded: false,
-                          //value: _currentUser,
-                          hint: Text('${defaultCatHintText}'),
-                          dropdownColor: Colors.white,
-                        );
-                      }),
+                  )
                 ]
             )
         ),
