@@ -98,7 +98,7 @@ class _PageSolde extends State<PageSolde> {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
-                      child: Image.asset("assets/apk.jpg"),
+                      child: Image.asset("assets/paygate.jpg"),
                     ),
                   )
                 ],
@@ -142,6 +142,7 @@ class _PageSolde extends State<PageSolde> {
       CategorieModel cat_ent = CategorieModel("Entretien", "Dépense", Colors.deepPurple.value, widget.user.id);
       CategorieModel cat_per = CategorieModel("Perte", "Dépense", Colors.cyanAccent.value, widget.user.id);
       CategorieModel cat_au = CategorieModel("Autre", "Dépense", Colors.grey.value, widget.user.id);
+      CategorieModel cat_rem = CategorieModel("Remboursement", "Dépense", Colors.redAccent.value, widget.user.id);
 
 
       CategorieModel cat_sal = CategorieModel("Salaire", "Revenu", Colors.blueAccent.value, widget.user.id);
@@ -151,7 +152,7 @@ class _PageSolde extends State<PageSolde> {
       CategorieModel cat_divi = CategorieModel("Dividende", "Revenu", Colors.limeAccent.value, widget.user.id);
       CategorieModel cat_Inv = CategorieModel("Investissement", "Revenu", Colors.amberAccent.value, widget.user.id);
       CategorieModel cat_lot = CategorieModel("Lotterie", "Revenu", Colors.cyanAccent.value, widget.user.id);
-      CategorieModel cat_rem = CategorieModel("Remboursemment", "Revenu", Colors.redAccent.value, widget.user.id);
+      CategorieModel cat_remb = CategorieModel("Remboursement", "Revenu", Colors.redAccent.value, widget.user.id);
       CategorieModel cat_aut = CategorieModel("Autre", "Revenu", Colors.grey.value, widget.user.id);
 
 
@@ -160,6 +161,7 @@ class _PageSolde extends State<PageSolde> {
       autreOperations.saveCat(cat_au);
       autreOperations.saveCat(cat_lot);
       autreOperations.saveCat(cat_rem);
+      autreOperations.saveCat(cat_remb);
       autreOperations.saveCat(cat_divi);
       autreOperations.saveCat(cat_Inv);
       autreOperations.saveCat(cat_cou);

@@ -134,22 +134,19 @@ class _PageTransactionState extends State<PageTransaction> {
                   alignment: Alignment.center,
                   color: Colors.green,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 40.0),
-                        child: Container(
-                            child: Text(
-                              DateFormat.yMMMMd("fr_FR").format(date),
-                              style: TextStyle(fontSize: 30),
-                            )
-                        ),
-                      ),
                       Container(
+                          child: Text(
+                            DateFormat.yMMMMd("fr_FR").format(date),
+                            style: TextStyle(fontSize: 30),
+                          )
+                      ),
+                      /*Container(
                           child: IconButton(onPressed: (){
                             setState(() {
                             });
-                          }, icon: Icon(Icons.view_list),alignment: Alignment.center,))
+                          }, icon: Icon(Icons.view_list),alignment: Alignment.center,))*/
                     ],
                   )
               ),
@@ -218,7 +215,7 @@ class _PageTransactionState extends State<PageTransaction> {
                                       ],
                                     ),
                                     onTap: (){
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,)));
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,currentUser: widget.currentUser,)));
                                     },
                                   ),
                                 ),

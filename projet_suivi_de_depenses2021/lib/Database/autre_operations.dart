@@ -173,6 +173,16 @@ class AutreOperations{
     return CategorieModel.fromMap(result.first);
   }
 
+  Future<CategorieModel> getCatByName(String name,User user) async {
+    var dbClient = await dbHelper.database;
+    String sql;
+    sql = "SELECT * FROM categories WHERE user_id = ${user.id} AND nom LIKE '$name' AND type LIKE 'Dépense'";
+
+    var result = await dbClient.rawQuery(sql);
+
+    return CategorieModel.fromMap(result.first);
+  }
+
   Future<List<CategorieModel>?> getCatByType(String type,User user) async {
     var dbClient = await dbHelper.database;
     String sql;

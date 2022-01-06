@@ -255,14 +255,14 @@ class _PageStatsState extends State<PageStats> {
 
                             ))
                             : Stack(
-                              children: [
-                                Container(
-                                  color: Colors.white,
-                                  child: charts.PieChart(
-                                      _seriesPieDataR,
-                                      animate: true,
-                                      animationDuration: Duration(milliseconds: 500),
-                                      /*behaviors: [
+                          children: [
+                            Container(
+                              color: Colors.white,
+                              child: charts.PieChart(
+                                  _seriesPieDataR,
+                                  animate: true,
+                                  animationDuration: Duration(milliseconds: 500),
+                                  /*behaviors: [
                                   new charts.DatumLegend(
                                     outsideJustification: charts.OutsideJustification.endDrawArea,
                                     horizontalFirst: false,
@@ -274,26 +274,26 @@ class _PageStatsState extends State<PageStats> {
                                         fontSize: 11),
                                   )
                                 ],*/
-                                      defaultRenderer: charts.ArcRendererConfig(
-                                          arcWidth: 70,
-                                          arcRendererDecorators: [
-                                            charts.ArcLabelDecorator(
-                                                labelPosition: charts.ArcLabelPosition.inside)
-                                          ]
-                                      )),
+                                  defaultRenderer: charts.ArcRendererConfig(
+                                      arcWidth: 70,
+                                      arcRendererDecorators: [
+                                        charts.ArcLabelDecorator(
+                                            labelPosition: charts.ArcLabelPosition.inside)
+                                      ]
+                                  )),
+                            ),
+                            Center(
+                              child: Text(
+                                "Revenus",
+                                style: TextStyle(
+                                    fontSize: 15.0,
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold
                                 ),
-                                Center(
-                                  child: Text(
-                                    "Revenus",
-                                    style: TextStyle(
-                                        fontSize: 15.0,
-                                        color: Colors.blue,
-                                        fontWeight: FontWeight.bold
-                                    ),
-                                  ),
-                                )
-                              ],
-                            );
+                              ),
+                            )
+                          ],
+                        );
                       }
                     }),
               ),

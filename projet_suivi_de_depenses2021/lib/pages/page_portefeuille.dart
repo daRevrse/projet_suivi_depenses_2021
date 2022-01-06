@@ -39,13 +39,14 @@ class _PagePortefeuilleState extends State<PagePortefeuille> {
   getListes()async{
     var _listComptes = await compteOperations.getCompteByUser(widget.currentUser);
     var _listBudgets = await autreOperations.getBudgetsByUser(widget.currentUser);
-    var _listDettes = await detteOperations.getDettesByUser(widget.currentUser);
+    detteOperations.getDettesByUser(widget.currentUser).then((value) => listDettes = value!);
 
 
     setState(() {
+      //listDettes = _listDettes!;
       listComptes = _listComptes!;
       listBudgets = _listBudgets!;
-      listDettes = _listDettes!;
+
 
     });
   }
@@ -276,7 +277,14 @@ class _PagePortefeuilleState extends State<PagePortefeuille> {
                         ),
                         title: Text("${budget.titre}"),
                         subtitle: Text("${budget.description}"),
-                        trailing: Text("${budget.montant}"),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text("${budget.montant}"),
+                            Text("Encore ${budget.date_fin!.difference(DateTime.now()).inDays} jours"),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -331,18 +339,31 @@ class _PagePortefeuilleState extends State<PagePortefeuille> {
                       ),
                     );
                   }else {
-                    return Container(
-                    color: Colors.white,
-                    child: ListTile(
-                      onTap: (){
-                        Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageDette(currentDette: _det,currentUser: widget.currentUser,)));
-                      },
-                      leading: CircleAvatar(child: Text("${_det.creancier![0]}"),),
-                      title: Text("${_det.creancier}"),
-                      subtitle: Text("${_det.description}"),
-                      trailing: Text("${_det.montant}"),
-                    ),
-                  );
+                    return Card(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15))
+                        ),
+                      child: ListTile(
+                        onTap: (){
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageDette(currentDette: _det,currentUser: widget.currentUser,)));
+                        },
+                        leading: CircleAvatar(child: Text("${_det.creancier![0]}"),),
+                        title: Text("${_det.creancier}"),
+                        subtitle: Text("${_det.description}"),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            _det.restant == 0 ? Text("${_det.montant}",style: TextStyle(decoration: TextDecoration.lineThrough)) : Text("${_det.montant}"),
+                            _det.restant == 0 ? Text("Dette remboursé") : Text("Dette en cours")
+                          ],
+                        ),
+                      ),
+                  ),
+                    );
                   }
                 }).toList(),
               ),

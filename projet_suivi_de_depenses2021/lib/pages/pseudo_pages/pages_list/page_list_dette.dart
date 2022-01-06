@@ -79,28 +79,28 @@ class _ListeDettesState extends State<ListeDettes> {
                     child: ListView(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      children: snapshot.data!.map((dette) {
+                      children: snapshot.data!.map((_det) {
                         return Card(
-                          elevation: 5,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                          color: Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(15),
-                                    bottomRight: Radius.circular(15),
-                                  )
-                              ),
-                              child: ListTile(
-                                onTap: (){
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageDette(currentDette: dette,currentUser: widget.user,)));
-                                },
-                                leading: CircleAvatar(child: Text("${dette.creancier![0]}"),),
-                                title: Text("${dette.creancier}"),
-                                subtitle: Text("${dette.description}"),
-                                trailing: Text("${dette.montant}"),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(Radius.circular(15))
+                            ),
+                            child: ListTile(
+                              onTap: (){
+                                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageDette(currentDette: _det,currentUser: widget.user,)));
+                              },
+                              leading: CircleAvatar(child: Text("${_det.creancier![0]}"),),
+                              title: Text("${_det.creancier}"),
+                              subtitle: Text("${_det.description}"),
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  _det.restant == 0 ? Text("${_det.montant}",style: TextStyle(decoration: TextDecoration.lineThrough)) : Text("${_det.montant}"),
+                                  _det.restant == 0 ? Text("Dette remboursé") : Text("Dette en cours")
+                                ],
                               ),
                             ),
                           ),

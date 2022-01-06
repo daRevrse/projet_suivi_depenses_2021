@@ -207,7 +207,7 @@ class _PageCompteState extends State<PageCompte> {
                                       ],
                                     ),
                                     onTap: (){
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,)));
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,currentUser: widget.currentUser,)));
                                     },
                                   ),
                                 ),

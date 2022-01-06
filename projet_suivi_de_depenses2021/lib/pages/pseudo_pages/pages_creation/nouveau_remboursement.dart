@@ -37,11 +37,23 @@ class _NewRemboursement extends State<NewRemboursement> {
   TextEditingController montantController = TextEditingController();
 
   CompteModel? compte;
+  CategorieModel? cat;
   String defaultCptHintText = "Selectionner un compte";
+
+  bool check = false;
+
+  getCategorie()async{
+    var _cat = await autreOperations.getCatByName("Remboursement", widget.user);
+
+    setState(() {
+      cat = _cat;
+    });
+  }
 
   @override
   void initState() {
     dateController.text = DateFormat.yMd().format(date);
+    getCategorie();
     // TODO: implement initState
     super.initState();
   }
@@ -148,7 +160,7 @@ class _NewRemboursement extends State<NewRemboursement> {
                   decoration: InputDecoration(
                     hintText: 'CFA',
                     labelText: 'Montant',
-
+                    errorText: check ? "Vous ne pouvez rembourser que ${widget.dette.restant} Fcfa" : null,
                     labelStyle: TextStyle(
                       fontSize: 15,
                       color:Colors.black,
@@ -166,7 +178,7 @@ class _NewRemboursement extends State<NewRemboursement> {
                     return DropdownButton<CompteModel>(
                       items: snapshot.data!
                           .map((_compte) => DropdownMenuItem<CompteModel>(
-                        child: Text("${_compte.nom}"),
+                        child: Text("${_compte.nom} : ${_compte.montant} Fcfa"),
                         value: _compte,
                       ))
                           .toList(),
@@ -200,21 +212,30 @@ class _NewRemboursement extends State<NewRemboursement> {
                     Container(width: 30,),
                     ElevatedButton(
                       onPressed: () async {
-                        RemboursementModel remb = RemboursementModel(date, int.parse(montantController.text), widget.user.id,compte!.id,widget.dette.id);
-                        await transactionOperations.saveRemboursement(remb);
+                        if (int.parse(montantController.text) <= widget.dette.restant!) {
+                          RemboursementModel remb = RemboursementModel(date, int.parse(montantController.text), widget.user.id,compte!.id,widget.dette.id);
+                          await transactionOperations.saveRemboursement(remb);
 
-                        setState(() {
-                          date = DateTime.now();
-                          time = TimeOfDay.fromDateTime(date);
-                          compte!.montant = (compte!.montant! - remb.montant!);
-                          widget.dette.restant = (widget.dette.restant! - remb.montant!);
-                        });
+                          TransactionModel trans = TransactionModel(date, "J'ai remboursé à ${widget.dette.creancier}", int.parse(montantController.text), "Dépense", widget.user.id, compte!.id, cat!.id);
+                          await transactionOperations.saveTransaction(trans);
 
-                        await autreOperations.updateDette(widget.dette);
+                          setState(() {
+                            date = DateTime.now();
+                            time = TimeOfDay.fromDateTime(date);
+                            compte!.montant = (compte!.montant! - remb.montant!);
+                            widget.dette.restant = (widget.dette.restant! - remb.montant!);
+                          });
 
-                        await compteOperations.updateCompte(compte!);
+                          await autreOperations.updateDette(widget.dette);
 
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> PageDette(currentUser: widget.user,currentDette: widget.dette,)));
+                          await compteOperations.updateCompte(compte!);
+
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> PageDette(currentUser: widget.user,currentDette: widget.dette,)));
+                        }else{
+                          setState(() {
+                            check = true;
+                          });
+                        }
 
                       },
                       child: Text("Rembourser"),)

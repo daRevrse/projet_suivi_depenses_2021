@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.projet_suivi_de_depenses2021">
    <application
-        android:label="projet_suivi_de_depenses2021"
+        android:label="Gérance"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

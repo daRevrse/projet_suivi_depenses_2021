@@ -103,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             Container(
-                child: Image.asset("assets/apk.jpg"),
+                child: Image.asset("assets/paygate.jpg"),
               )
           ],
         ),

@@ -41,7 +41,7 @@ class _PageParametreState extends State<PageParametre> {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.only(top: 30),
+        padding: EdgeInsets.only(top: 20),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
@@ -58,7 +58,7 @@ class _PageParametreState extends State<PageParametre> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.max,
                     children:[
-                      TextButton(
+                      /*TextButton(
                         style: ButtonStyle(
                         ),
                         onPressed:(){
@@ -80,7 +80,7 @@ class _PageParametreState extends State<PageParametre> {
                           height: 2,
                           color: Colors.grey,
                         ),
-                      ),
+                      ),*/
                       TextButton(
                         style: ButtonStyle(
                         ),
@@ -150,7 +150,7 @@ class _PageParametreState extends State<PageParametre> {
                           color: Colors.grey,
                         ),
                       ),
-                      TextButton(
+                      /*TextButton(
                         style: ButtonStyle(
                         ),
                         onPressed:(){} ,
@@ -170,15 +170,31 @@ class _PageParametreState extends State<PageParametre> {
                           height: 2,
                           color: Colors.grey,
                         ),
-                      ),
+                      ),*/
                       TextButton(
                         onPressed:() {
-                          setState(() async {
-                            final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                            sharedPreferences.clear();
-                            Navigator.of(context)
-                                .pushReplacement(MaterialPageRoute(builder: (_) => PageConnexion()));
-                          });
+                          showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: const Text('Vous allez supprimer toute votre progression?'),
+                                content: const Text('Etes-vous vraiment sûre?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, 'Non'),
+                                    child: const Text('Non'),
+                                  ),
+                                  TextButton(
+                                    onPressed: ()async {
+                                      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                                      sharedPreferences.clear();
+                                      Navigator.of(context)
+                                          .pushReplacement(MaterialPageRoute(builder: (_) => PageConnexion()));
+                                     },
+                                    child: const Text('Oui'),
+                                  ),
+                                ],
+                              )
+                          );
                         } ,
                         child: Container(
                           width: double.infinity,

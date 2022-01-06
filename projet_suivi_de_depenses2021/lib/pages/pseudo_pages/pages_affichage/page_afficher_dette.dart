@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_suivi_de_depenses2021/Constants/popMenuConsts.dart';
 import 'package:projet_suivi_de_depenses2021/Database/autre_operations.dart';
+import 'package:projet_suivi_de_depenses2021/Database/dette_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Database/transactions_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Models/detteModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/remboursementModel.dart';
@@ -22,6 +23,7 @@ class _PageDetteState extends State<PageDette> {
 
   TransactionOperations transactionOperations = TransactionOperations();
   AutreOperations autreOperations = AutreOperations();
+  DetteOperations detteOperations = DetteOperations();
 
   num restant = 0;
 
@@ -31,16 +33,16 @@ class _PageDetteState extends State<PageDette> {
     //print(total_sum);
     setState(() {
       if(total_remb!=null) {
-        restant = widget.currentDette.montant!;
-      } else {
         restant = widget.currentDette.montant! - total_remb;
-
+      } else {
+        restant = widget.currentDette.montant!;
       }
+      widget.currentDette.restant = restant;
     });
 
-    DetteModel _dette = DetteModel(widget.currentDette.creancier, widget.currentDette.description, widget.currentDette.montant, restant, widget.currentDette.datetime, widget.currentDette.user_id);
+   /* DetteModel _dette = DetteModel(widget.currentDette.creancier, widget.currentDette.description, widget.currentDette.montant, restant, widget.currentDette.datetime, widget.currentDette.user_id);
 
-    await autreOperations.updateDette(_dette);
+    await autreOperations.updateDette(_dette);*/
   }
 
   @override
@@ -48,6 +50,7 @@ class _PageDetteState extends State<PageDette> {
     // TODO: implement initState
     super.initState();
     calcRest();
+    detteOperations.updateDette(widget.currentDette);
   }
 
 
@@ -135,7 +138,7 @@ class _PageDetteState extends State<PageDette> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Restant"),
-                          Text("${widget.currentDette.restant} FCFA",style: TextStyle(color: Colors.red),)
+                          Text("${restant} FCFA",style: TextStyle(color: Colors.red),)
                         ],
                       ),
                     ),
@@ -231,9 +234,9 @@ class _PageDetteState extends State<PageDette> {
   }
 
   void choiceAction(String choice){
-    if(choice == PopMenuRemboursement.Rembourser){
-      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> NewRemboursement(dette: widget.currentDette,user: widget.currentUser,)));
-    }
+      if(choice == PopMenuRemboursement.Rembourser){
+        restant == 0 || widget.currentDette.restant == 0 ? null : Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> NewRemboursement(dette: widget.currentDette,user: widget.currentUser,)));
+      }
     else if(choice == PopMenuRemboursement.Modifier){
       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> ModifierDette(dette: widget.currentDette,user: widget.currentUser,)));
     }

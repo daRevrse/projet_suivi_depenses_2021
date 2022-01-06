@@ -91,6 +91,20 @@ class TransactionOperations{
     return list;
   }
 
+  Future<List<TransactionModel>?> getTransactionsByCategorieByType(User user,String type,CategorieModel cat) async {
+    var dbClient = await dbHelper.database;
+    String sql;
+    sql = "SELECT * FROM transactions WHERE user_id = ${user.id} AND cat_id = ${cat.id} AND type LIKE '$type'";
+
+    var result = await dbClient.rawQuery(sql);
+    if (result.length == 0) return null;
+
+    List<TransactionModel> list = result.map((item) {
+      return TransactionModel.fromMap(item);
+    }).toList();
+    return list;
+  }
+
   Future<List<TransactionModel>?> getTransactionsByCatForBudget(User user,CategorieModel cat,DateTime debut, DateTime fin) async {
     var dbClient = await dbHelper.database;
     String sql;
@@ -122,7 +136,7 @@ class TransactionOperations{
   Future<List<TransactionModel>?> getTransactionsByPeriode(User user,DateTime date_debut,DateTime date_fin) async {
     var dbClient = await dbHelper.database;
     String sql;
-    sql = "SELECT * FROM transactions WHERE user_id = ${user.id} AND datetime BETWEEN '${date_debut}' AND '${date_fin}'";
+    sql = "SELECT * FROM transactions WHERE user_id = ${user.id} AND datetime >= '${date_debut}' AND datetime < '${date_fin}'";
 
     var result = await dbClient.rawQuery(sql);
     if (result.isEmpty) return null;
@@ -169,6 +183,31 @@ class TransactionOperations{
     var dbClient = await dbHelper.database;
     var result = await dbClient.update("transactions", transactionModel.toMap(),
         where: "id = ?", whereArgs: [transactionModel.id]);
+    return result;
+  }
+
+  Future getSomme(User user) async {
+    var dbClient = await dbHelper.database;
+    var res = await dbClient.rawQuery("SELECT SUM(montant) AS TOTAL from transactions WHERE user_id = ${user.id}");
+    return res.toList();
+  }
+
+  Future getSommeByType(User user,String type) async {
+    var dbClient = await dbHelper.database;
+    var res = await dbClient.rawQuery("SELECT SUM(montant) AS TOTALTYPE from transactions WHERE user_id = ${user.id} AND type = '$type'");
+    return res.toList();
+  }
+
+  Future getSommeByCat(User user,String type,CategorieModel cat) async {
+    var dbClient = await dbHelper.database;
+    var res = await dbClient.rawQuery("SELECT SUM(montant) AS TOTALCAT from transactions WHERE user_id = ${user.id} AND type = '$type' AND cat_id = ${cat.id}");
+    return res.toList();
+  }
+
+  Future<int> deleteTransaction(int? id) async {
+    int result;
+    var dbClient = await dbHelper.database;
+    result = await dbClient.rawDelete('DELETE FROM transactions WHERE id = $id');
     return result;
   }
 

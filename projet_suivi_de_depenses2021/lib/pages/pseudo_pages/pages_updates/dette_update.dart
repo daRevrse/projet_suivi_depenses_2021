@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:projet_suivi_de_depenses2021/Database/autre_operations.dart';
+import 'package:projet_suivi_de_depenses2021/Database/dette_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Database/transactions_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Models/detteModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
@@ -22,6 +23,7 @@ class ModifierDette extends StatefulWidget {
 class _ModifierDette extends State<ModifierDette> {
 
   AutreOperations autreOperations = AutreOperations();
+  DetteOperations detteOperations = DetteOperations();
   TransactionOperations transactionOperations = TransactionOperations();
   TextEditingController controller = new TextEditingController();
 
@@ -38,14 +40,16 @@ class _ModifierDette extends State<ModifierDette> {
       if(total_remb!=null) {
         restant = widget.dette.montant! - total_remb;
       } else {
-        restant = widget.dette.montant!;
-
+        restant = widget.dette.restant!;
       }
     });
   }
 
   @override
   void initState() {
+
+    restant = widget.dette.restant!;
+
     setState(() {
       descController.text = widget.dette.description!;
       montantController.text = widget.dette.montant!.toString();
@@ -67,8 +71,8 @@ class _ModifierDette extends State<ModifierDette> {
             color: Colors.white,
             onPressed: () async {
               calcRest();
-              DetteModel dette = DetteModel(widget.dette.creancier,descController.text,int.parse(montantController.text),restant,date,widget.user.id);
-              await autreOperations.updateDette(dette);
+              DetteModel _det = DetteModel(widget.dette.creancier,descController.text,widget.dette.montant,restant,date,widget.user.id);
+              await detteOperations.updateDette(_det);
 
               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context)=> PageDette(currentUser: widget.user,currentDette: widget.dette)));
 
@@ -129,7 +133,8 @@ class _ModifierDette extends State<ModifierDette> {
                         onChanged: (value){
                           //montantController.text = value;
                           setState(() {
-                            widget.dette.montant = int.parse(value);
+                            widget.dette.montant = int.parse(montantController.text);
+                            calcRest();
                           });
                         }
                     ),

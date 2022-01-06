@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:projet_suivi_de_depenses2021/Database/transactions_operations.dart';
 import 'package:projet_suivi_de_depenses2021/Models/transactionModel.dart';
 import 'package:projet_suivi_de_depenses2021/Models/userModel.dart';
@@ -265,7 +266,7 @@ class _ListeTransactionsState extends State<ListeTransactions> {
                                   ],
                                 ),
                                 onTap: (){
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,)));
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> PageAfficherTransaction(transaction: trans,currentUser: widget.user,)));
                                 },
                               ),
                             ),
@@ -298,19 +299,27 @@ class _ListeTransactionsState extends State<ListeTransactions> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                  IconButton(onPressed: (){setState((){
-                   date = date.subtract(Duration(days: 1));
-                   predate = date.subtract(Duration(days: 1));
-                   nextdate = date.add(Duration(days: 1));
-                   listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate,nextdate);
+                   if (date == DateTime.now()) {
+                     date = date.subtract(Duration(hours: date.hour, minutes: date.minute, seconds: date.second));
+                     predate = date.subtract(Duration(days: 1));
+                   }else{
+                     date = date.subtract(Duration(days: 1));
+                     predate = date.subtract(Duration(days: 1));
+                   }
+                   listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate,date);
                  });}, icon: Icon(Icons.arrow_back_ios),color: Colors.white,),
 
-                 Text(date.day.toString(),style: TextStyle(color: Colors.white),),
+                 Text(DateFormat.yMMMMd("fr_FR").format(date).toString(),style: TextStyle(color: Colors.white),),
 
                  IconButton(onPressed: (){setState(() {
-                   date = date.add(Duration(days: 1));
-                   predate = date.subtract(Duration(days: 1));
-                   nextdate = date.add(Duration(days: 1));
-                   listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate,nextdate);
+                   if (date == DateTime.now()) {
+                     date = date.add(Duration(hours: 24 - date.hour, minutes: 1440 - date.minute, seconds: 86400 - date.second));
+                     nextdate = date.add(Duration(days: 1));
+                   }else{
+                     date = date.add(Duration(days: 1));
+                     nextdate = date.add(Duration(days: 1));
+                   }
+                   listTrans = transactionOperations.getTransactionsByPeriode(widget.user, date,nextdate);
                  });}, icon: Icon(Icons.arrow_forward_ios),color: Colors.white,),
               ],
             );
@@ -332,7 +341,7 @@ class _ListeTransactionsState extends State<ListeTransactions> {
             listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate, nextdate);
           });}, icon: Icon(Icons.arrow_back_ios),color: Colors.white,),
 
-          Text("${predate.day} - ${nextdate.day}",style: TextStyle(color: Colors.white),),
+          Text("${DateFormat.yMMMMd("fr_FR").format(predate)} - ${DateFormat.yMMMMd("fr_FR").format(nextdate)}",style: TextStyle(color: Colors.white),),
 
           IconButton(onPressed: (){setState(() {
             nextdate = nextdate.add(Duration(days: 7));
@@ -355,20 +364,44 @@ class _ListeTransactionsState extends State<ListeTransactions> {
         children: [
           IconButton(onPressed: (){
             setState(() {
-            predate = date.subtract(Duration(days: 30));
-            date = predate;
-            nextdate = predate.add(Duration(days: 30));
-            listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate, nextdate);
+            if (date.month == 4 || date.month == 6 || date.month == 9 || date.month == 11) {
+              date = date.subtract(Duration(days: 30));
+              predate = date.subtract(Duration(days: 30));
+              //nextdate = predate.add(Duration(days: 30));
+            }else if((date.year%400 == 0 || date.year%100 != 0) && date.year%4 == 0 && date.month == 2){
+              date = date.subtract(Duration(days: 29));
+              predate = date.subtract(Duration(days: 29));
+              //nextdate = predate.add(Duration(days: 29));
+            }else if(date.month == 2){
+              date = date.subtract(Duration(days: 28));
+              predate = date.subtract(Duration(days: 28));
+              //nextdate = predate.add(Duration(days: 28));
+            }else{
+              date = date.subtract(Duration(days: 31));
+              predate = date.subtract(Duration(days: 31));
+              //nextdate = predate.add(Duration(days: 31));
+            }
+            listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate, date);
           }
           );}, icon: Icon(Icons.arrow_back_ios),color: Colors.white,),
 
-          Text(date.month.toString(),style: TextStyle(color: Colors.white),),
+          Text(DateFormat.yMMMM("fr_FR").format(date),style: TextStyle(color: Colors.white),),
 
           IconButton(onPressed: (){setState(() {
-            predate = nextdate.subtract(Duration(days: 30));
-            nextdate = date.add(Duration(days: 30));
-            date = nextdate;
-            listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate, nextdate);
+            if (date.month == 4 || date.month == 6 || date.month == 9 || date.month == 11) {
+              date = date.add(Duration(days: 30));
+              nextdate = date.add(Duration(days: 30));
+            }else if((date.year%400 == 0 || date.year%100 != 0) && date.year%4 == 0 && date.month == 2){
+              date = date.add(Duration(days: 29));
+              nextdate = date.add(Duration(days: 29));
+            }else if(date.month == 2){
+              date = date.add(Duration(days: 28));
+              nextdate = date.add(Duration(days: 28));
+            }else{
+              date = date.add(Duration(days: 31));
+              nextdate = date.add(Duration(days: 31));
+            }
+            listTrans = transactionOperations.getTransactionsByPeriode(widget.user, date, nextdate);
           });}, icon: Icon(Icons.arrow_forward_ios),color: Colors.white,),
         ],
       );
@@ -385,19 +418,27 @@ class _ListeTransactionsState extends State<ListeTransactions> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           IconButton(onPressed: (){setState(() {
-            predate = date.subtract(Duration(days: 365));
-            date = predate;
-            nextdate = predate.add(Duration(days: 365));
-            listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate, nextdate);
+            if((date.year%400 == 0 || date.year%100 != 0) && date.year%4 == 0){
+              date = date.subtract(Duration(days: 366));
+              predate = date.subtract(Duration(days: 366));
+            }else{
+              date = date.subtract(Duration(days: 365));
+              predate = date.subtract(Duration(days: 365));
+            }
+            listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate, date);
           });}, icon: Icon(Icons.arrow_back_ios),color: Colors.white,),
 
           Text(date.year.toString(),style: TextStyle(color: Colors.white),),
 
           IconButton(onPressed: (){setState(() {
-            predate = nextdate.subtract(Duration(days: 365));
-            nextdate = date.add(Duration(days: 365));
-            date = nextdate;
-            listTrans = transactionOperations.getTransactionsByPeriode(widget.user, predate, nextdate);
+            if ((date.year%400 == 0 || date.year%100 != 0) && date.year%4 == 0) {
+              date = date.add(Duration(days: 366));
+              nextdate = date.add(Duration(days: 366));
+            }else{
+              date = date.add(Duration(days: 365));
+              nextdate = date.add(Duration(days: 365));
+            }
+            listTrans = transactionOperations.getTransactionsByPeriode(widget.user, date, nextdate);
           });}, icon: Icon(Icons.arrow_forward_ios),color: Colors.white,),
         ],
       );
@@ -409,7 +450,10 @@ class _ListeTransactionsState extends State<ListeTransactions> {
           date = date.subtract(Duration(days: 365));
         });}, icon: Icon(Icons.arrow_back_ios),color: Colors.white,),*/
 
-        Text("Toutes les transactions",style: TextStyle(color: Colors.white),),
+        Padding(
+          padding: EdgeInsets.only(bottom: 8.0),
+          child: Text("Toutes les transactions",style: TextStyle(color: Colors.white),),
+        ),
 
         /*IconButton(onPressed: (){setState(() {
           date = date.add(Duration(days: 365));

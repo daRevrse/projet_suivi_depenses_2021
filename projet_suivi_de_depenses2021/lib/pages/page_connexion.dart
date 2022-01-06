@@ -126,7 +126,7 @@ class _PageConnexion extends State<PageConnexion> {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
-                      child: Image.asset("assets/apk.jpg"),
+                      child: Image.asset("assets/paygate.jpg"),
                     ),
                   )
                 ],
